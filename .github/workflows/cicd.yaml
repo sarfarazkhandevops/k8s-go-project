@@ -1,0 +1,99 @@
+name: CI/CD Pipeline
+
+"on":
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '.github/workflows/cicd.yaml'
+
+
+jobs:
+      build:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+
+          - name: Set up Go
+            uses: actions/setup-go@v4
+            with:
+              go-version: '1.22'
+
+          - name: Build
+            run: |
+              go version
+              go build ./...
+
+          - name: Run tests
+            run: |
+              go test ./...
+
+      code-quality:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+
+          - name: Set up Go
+            uses: actions/setup-go@v4
+            with:
+              go-version: '1.22'
+
+          - name: Run code quality checks
+            run: |
+              go vet ./...
+              golint ./...
+
+
+      push:
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+
+          - name: Set up docker buildx
+            uses: docker/setup-buildx-action@v2
+
+          - name: Log in to DockerHub
+            uses: docker/login-action@v2
+            with:
+              username: ${{ secrets.DOCKER_USERNAME }}
+              password: ${{ secrets.DOCKER_TOKEN }}
+
+
+          - name: Build and push Docker image
+            uses: docker/build-push-action@v5
+            with:
+              context: .
+              file: ./Dockerfile
+              push: true
+              tags: ${{ secrets.DOCKER_USERNAME }}/thisisdockeradm:${{ github.run_id }}
+
+
+      
+      update-newtag-in-helm-chart:
+        runs-on: ubuntu-latest
+        needs: push
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+            with:
+              token: ${{ mysecrets_github_token }}
+
+
+
+          - name: Update Helm chart with new image tag
+            run: |
+              NEW_TAG=${{ github.run_id }}
+              sed -i "s/tag:.*/tag: ${NEW_TAG}/" k8s/maninfest/helm-chart/values.yaml
+          
+          - name: Commit and push changes
+            run: |
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git add k8s/maninfest/helm-chart/values.yaml
+              git commit -m "Update Helm chart with new image tag: ${{ github.run_id }}"
+              git push origin main
