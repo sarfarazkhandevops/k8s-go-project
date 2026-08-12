@@ -1,26 +1,17 @@
-# Default values for go-web-app-chartss
+# Default values for go-web-app-chart.
 
 replicaCount: 2
+
 image:
   repository: thisisdockeradm/go-web-app
   pullPolicy: IfNotPresent
-<<<<<<< HEAD
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-=======
-  tag: "31585237367"
+  tag: "31589250541"
 
->>>>>>> 52fac4e (Fix Helm image values)
 ingress:
   enabled: false
   className: ""
   annotations: {}
-<<<<<<< HEAD
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
-=======
 
->>>>>>> 52fac4e (Fix Helm image values)
   hosts:
     - host: chart-example.local
       paths:

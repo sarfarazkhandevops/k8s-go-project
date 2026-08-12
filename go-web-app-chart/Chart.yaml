@@ -2,7 +2,7 @@ apiVersion: v2
 name: go-web-app-chart
 description: A Helm chart for Kubernetes
 
-# A chart can be either an 'application' or a 'library' A chart.
+#I am A chart can be either an 'application' or a 'library' A chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
 # to be deployed.
