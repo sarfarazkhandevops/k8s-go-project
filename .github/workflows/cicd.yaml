@@ -6,7 +6,6 @@ on:
       - main
     paths-ignore:
       - "README.md"
-      - "go-web-app-chart/values.yaml"
 
 permissions:
   contents: write
