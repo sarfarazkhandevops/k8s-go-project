@@ -1,4 +1,4 @@
-# Default values for go-web-app-chart.
+# Default values for go-web-app-chartss
 
 replicaCount: 2
 image:
