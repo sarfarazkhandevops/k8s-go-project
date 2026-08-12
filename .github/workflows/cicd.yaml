@@ -114,16 +114,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install yq
-        uses: mikefarah/yq@v4
-
       - name: Update Helm image tag
         run: |
           NEW_TAG="${{ github.run_id }}"
 
           echo "New Docker image tag: ${NEW_TAG}"
 
-          yq -i '.image.tag = strenv(NEW_TAG)' go-web-app-chart/values.yaml
+          sed -i "s/^  tag: .*/  tag: \"${NEW_TAG}\"/" go-web-app-chart/values.yaml
 
           echo "Updated Helm values:"
           cat go-web-app-chart/values.yaml
@@ -131,10 +128,10 @@ jobs:
       - name: Verify Helm image tag
         run: |
           echo "Helm image repository:"
-          yq '.image.repository' go-web-app-chart/values.yaml
+          grep "repository:" go-web-app-chart/values.yaml
 
           echo "Helm image tag:"
-          yq '.image.tag' go-web-app-chart/values.yaml
+          grep "tag:" go-web-app-chart/values.yaml
 
       - name: Commit and push changes
         run: |
