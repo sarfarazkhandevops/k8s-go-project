@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: go-web-go
-        image: thisisdockeradm/go-web-app::{{ .Values.image.tag }}
+        image: thisisdockeradm/go-web-app:{{ .Values.image.tag }}
         ports:
         - containerPort: 8080
